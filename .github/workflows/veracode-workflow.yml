@@ -1,0 +1,27 @@
+name: Veracode Workflow
+
+on:
+  workflow_call:
+    inputs:
+      APP_NAME:
+        type: string
+        required: true
+    secrets:
+      VERACODE_API_ID:
+        required: true
+      VERACODE_API_KEY:
+        required: true
+
+jobs:
+  veracode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Veracode
+        uses: veracode/veracode-uploadandscan-action@0.2.1
+        with:
+          appname: ${{ inputs.APP_NAME }}
+          createprofile: false
+          filepath: 'app/target/verademo.war'
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}

@@ -1,0 +1,27 @@
+name: Cluster Security Workflow
+
+on:
+  workflow_call:
+    inputs:
+      ENDPOINT:
+        required: true
+        type: string
+      REMOTE_DOCKER_IMAGE:
+        required: true
+        type: string
+    secrets:
+      STACKROX_REPO_USERNAME:
+        required: true
+      STACKROX_REPO_PASSWORD:
+        required: true
+
+jobs:
+  cluster-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          curl -u "${{ STACKROX_REPO_USERNAME }}:${{ STACKROX_REPO_PASSWORD }}" -L https://install.stackrox.io/3.0.48.0/bin/Linux/roxctl -o roxctl &&
+          chmod +x roxctl &&
+          sudo mv roxctl /usr/local/bin &&
+          roxctl image check --endpoint "${{ ENDPOINT }}" --image "${{ REMOTE_DOCKER_IMAGE }}"
