@@ -19,6 +19,5 @@
                     rm -rf .npmrc
                     echo "@deliowales:registry=https://npm.pkg.github.com/" > .npmrc
                     echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_MACHINE_TOKEN }}" >> .npmrc
-              - run: cat .npmrc
               - run: npm ci
               - run: npm run lint
