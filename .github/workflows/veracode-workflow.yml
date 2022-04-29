@@ -6,6 +6,9 @@ on:
       APP_NAME:
         type: string
         required: true
+      FILE_PATH:
+        type: string
+        required: true
     secrets:
       VERACODE_API_ID:
         required: true
@@ -22,6 +25,6 @@ jobs:
         with:
           appname: ${{ inputs.APP_NAME }}
           createprofile: false
-          filepath: 'app/target/verademo.war'
+          filepath: ${{ inputs.FILE_PATH }}
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
