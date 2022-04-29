@@ -2,6 +2,10 @@ name: Helm Linting Workflow
 
 on:
   workflow_call:
+    inputs:
+      VALUES_FILE:
+        type: string
+        required: true
 
 jobs:
   helm-lint:
@@ -11,7 +15,7 @@ jobs:
       - name: template
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: mkdir kubelinttest && helm template event -f ./helm/staging-demo-values.yaml ./helm --set releaseVersion=kubelinttesting > kubelinttest/deployment.yaml
+          exec: mkdir kubelinttest && helm template event -f ./helm/${{ inputs.VALUES_FILE }} ./helm --set releaseVersion=kubelinttesting > kubelinttest/deployment.yaml
       - name: Scan yamls
         id: kube-lint-scan
         uses: stackrox/kube-linter-action@v1
