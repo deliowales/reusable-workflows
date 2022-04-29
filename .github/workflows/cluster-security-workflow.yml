@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          curl -u "${{ secrets.STACKROX_REPO_USERNAME }}:${{ secrets.STACKROX_REPO_PASSWORD }}" -L https://install.stackrox.io/3.0.48.0/bin/Linux/roxctl -o roxctl &&
+          curl -O https://mirror.openshift.com/pub/rhacs/assets/3.66.1/bin/Linux/roxctl &&
           chmod +x roxctl &&
-          sudo mv roxctl /usr/local/bin &&
-          roxctl image check --endpoint "${{ inputs.ENDPOINT }}" --image "${{ inputs.REMOTE_DOCKER_IMAGE }}"
+          sudo mv roxctl /usr/local/bin
+      - run: roxctl image check --endpoint "${{ inputs.ENDPOINT }}" --image "${{ inputs.REMOTE_DOCKER_IMAGE }}"
