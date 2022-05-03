@@ -24,7 +24,7 @@ jobs:
         uses: veracode/veracode-uploadandscan-action@0.2.1
         with:
           appname: ${{ inputs.APP_NAME }}
-          createprofile: false
+          createprofile: true
           filepath: ${{ inputs.FILE_PATH }}
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}

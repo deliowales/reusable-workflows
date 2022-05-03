@@ -1,0 +1,45 @@
+name: Unit Testing Workflow
+
+on:
+  workflow_call:
+    inputs:
+      TEST_TYPE:
+        required: true
+        type: string
+    secrets:
+        GITHUB_MACHINE_TOKEN:
+          required: true
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    services:
+      postgres_tenant:
+        image: postgres:11.15
+        env:
+          POSTGRES_DB: pgsql_tenant
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: |
+          rm -rf .npmrc
+          echo "@deliowales:registry=https://npm.pkg.github.com/" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.MACHINE_TOKEN }}" >> .npmrc
+      - run: npm ci
+      - run: cp .env.example .env.test && cp .env.example .env && npm run build
+      - name: run tests
+        env:
+          JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+          DB_TENANT_HOST: localhost
+        run: npm run test:${{ inputs.TEST_TYPE }}
