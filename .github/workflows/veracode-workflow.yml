@@ -23,7 +23,7 @@ jobs:
       - run: |
           rm -rf .npmrc
           echo "@deliowales:registry=https://npm.pkg.github.com/" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.MACHINE_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_MACHINE_TOKEN }}" >> .npmrc
       - run: npm ci
       - run: curl -sSL https://download.sourceclear.com/ci.sh | bash -s scan . –skip-collectors go --allow-dirty --scan-collectors npm
         env:
