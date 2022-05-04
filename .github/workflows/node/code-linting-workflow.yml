@@ -10,10 +10,14 @@
       code-linting:
           runs-on: ubuntu-latest
           steps:
-              - name: Pull code
-                uses: actions/checkout@v3
-              uses: deliowales/reusable-workflows/.github/workflows/node/configure-node-workflow.yml@master
-                secrets:
-                  GITHUB_MACHINE_TOKEN: ${{ secrets.MACHINE_TOKEN }}
-              - name: Lint
-                run: npm run lint
+              - uses: actions/checkout@v3
+              - name: Code Linting
+                uses: actions/setup-node@v3
+                with:
+                    node-version: 16
+              - run: |
+                    rm -rf .npmrc
+                    echo "@deliowales:registry=https://npm.pkg.github.com/" > .npmrc
+                    echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_MACHINE_TOKEN }}" >> .npmrc
+              - run: npm ci
+              - run: npm run lint
