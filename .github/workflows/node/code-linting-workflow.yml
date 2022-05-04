@@ -1,0 +1,18 @@
+  name: Code Linting Workflow
+
+  on:
+    workflow_call:
+        secrets:
+            GITHUB_MACHINE_TOKEN:
+                required: true
+
+  jobs:
+      code-linting:
+          runs-on: ubuntu-latest
+          steps:
+              - name: Pull code
+                uses: actions/checkout@v3
+              - name: Configure node
+                uses: ./configure-node-workflow.yml
+              - name: Lint
+                run: npm run lint
