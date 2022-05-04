@@ -5,6 +5,12 @@ on:
     secrets:
       GITHUB_MACHINE_TOKEN:
         required: true
+      VERACODE_API_KEY:
+        required: true
+    inputs:
+      VERACODE_SLUG:
+        type: string
+        required: true
 
 jobs:
   veracode:
@@ -17,6 +23,9 @@ jobs:
       - run: |
           rm -rf .npmrc
           echo "@deliowales:registry=https://npm.pkg.github.com/" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_MACHINE_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.MACHINE_TOKEN }}" >> .npmrc
       - run: npm ci
       - run: curl -sSL https://download.sourceclear.com/ci.sh | bash -s scan . –skip-collectors go --allow-dirty --scan-collectors npm
+        env:
+          SRCCLR_WORKSPACE_SLUG: ${{ inputs.VERACODE_SLUG }}
+          SRCCLR_API_TOKEN: ${{ secrets.VERACODE_API_KEY }}
