@@ -13,6 +13,6 @@
               - name: Pull code
                 uses: actions/checkout@v3
               - name: Configure node
-                uses: ./configure-node-workflow.yml
+                uses: ./github/workflows/configure-node-workflow.yml
               - name: Lint
                 run: npm run lint
