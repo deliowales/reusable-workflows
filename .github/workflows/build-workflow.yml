@@ -63,7 +63,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Get release info
+        id: get_release
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Package and push artefacts to S3
         run: | 
-          tar zcf ${{ inputs.SERVICE_NAME }}-${{ steps.meta.outputs.tags }}.tgz terraform helm && 
-          aws s3 sync ${{ inputs.SERVICE_NAME }}-${{ steps.meta.outputs.tags }}.tgz s3://${{ inputs.S3_BUCKET_NAME }}/${{ inputs.SERVICE_NAME }}/helm/${{ steps.meta.outputs.tags }}
+          tar zcf ${{ inputs.SERVICE_NAME }}-${{ steps.get_release.outputs.tag_name }}.tgz terraform helm && 
+          aws s3 sync ${{ inputs.SERVICE_NAME }}-${{ steps.get_release.outputs.tag_name }}.tgz s3://${{ inputs.S3_BUCKET_NAME }}/${{ inputs.SERVICE_NAME }}/helm/${{ steps.get_release.outputs.tag_name }}
