@@ -9,6 +9,9 @@ on:
       SERVICE_NAME:
         required: true
         type: string
+      S3_BUCKET_NAME:
+        required: true
+        type: string
     secrets:
       GITHUB_MACHINE_TOKEN:
         required: true
@@ -59,3 +62,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Package and push artefacts to S3
+        run: | 
+          tar zcf ${{ inputs.SERVICE_NAME }}-${{ steps.meta.outputs.tags }}.tgz terraform helm && 
+          aws s3 sync ${{ inputs.SERVICE_NAME }}-${{ steps.meta.outputs.tags }}.tgz s3://${{ inputs.S3_BUCKET_NAME }}/${{ inputs.SERVICE_NAME }}/helm/${{ steps.meta.outputs.tags }}
