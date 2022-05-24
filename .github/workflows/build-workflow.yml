@@ -71,5 +71,6 @@ jobs:
 
       - name: Package and push artefacts to S3
         run: | 
-          tar zcf ${{ inputs.SERVICE_NAME }}-${{ steps.get_release.outputs.tag_name }}.tgz terraform helm && 
+          tar zcf ${{ inputs.SERVICE_NAME }}-${{ steps.get_release.outputs.tag_name }}.tgz terraform helm
+          ls -lisa
           aws s3 sync ${{ inputs.SERVICE_NAME }}-${{ steps.get_release.outputs.tag_name }}.tgz s3://${{ inputs.S3_BUCKET_NAME }}/${{ inputs.SERVICE_NAME }}/helm/${{ steps.get_release.outputs.tag_name }}
