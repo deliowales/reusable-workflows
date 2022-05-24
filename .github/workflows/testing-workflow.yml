@@ -42,4 +42,5 @@ jobs:
         env:
           JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
           DB_TENANT_HOST: localhost
+          TENANCY_LOCAL: true
         run: npm run test:${{ inputs.TEST_TYPE }}
