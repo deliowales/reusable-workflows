@@ -12,6 +12,9 @@ on:
       S3_BUCKET_NAME:
         required: true
         type: string
+      IAM_ROLE:
+        required: true
+        type: string
     secrets:
       GITHUB_MACHINE_TOKEN:
         required: true
@@ -38,7 +41,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::835441458204:role/GithubActionsAccessManagement
+          role-to-assume: ${{ inputs.IAM_ROLE }}
           aws-region: eu-west-1
           role-session-name: GithubAction
 
