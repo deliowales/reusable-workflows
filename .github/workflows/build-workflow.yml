@@ -97,6 +97,6 @@ jobs:
       - name: Push a package to Octopus Deploy 🐙
         uses: OctopusDeploy/push-package-action@v1.1.2
         with:
-          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+          api_key: ${{ secrets.CD_API_KEY }}
           packages: '${{ inputs.SERVICE_NAME }}.helm.${{ env.PACKAGE_VERSION }}.zip,${{ inputs.SERVICE_NAME }}.terragrunt.${{ env.PACKAGE_VERSION }}.zip'
-          server: https://delio.octopus.app
+          server: ${{ secrets.CD_SERVER }}
