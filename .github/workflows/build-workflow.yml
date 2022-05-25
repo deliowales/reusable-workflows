@@ -76,6 +76,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set Version
+        run: echo "PACKAGE_VERSION=${{ steps.get_release.outputs.tag_name }}" >> $GITHUB_ENV
 
       - name: Install Octopus CLI 🐙
         uses: OctopusDeploy/install-octopus-cli-action@v1
@@ -84,11 +86,17 @@ jobs:
 
       - name: Package Helm
         run: |
-          octo pack --id="Helm" --format="Zip" --version="${{ steps.get_release.outputs.tag_name }}" --basePath="$GITHUB_WORKSPACE/helm" --outFolder="$GITHUB_WORKSPACE"
+          octo pack --id="${{ inputs.SERVICE_NAME }}.helm" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/helm" --outFolder="$GITHUB_WORKSPACE"
+
+      - name: Package Terragrunt
+        run: |
+          mkdir terragrunt
+          mv terraform s3-backend.tpl s3-provider.tpl azurerm-backend.tpl azurerm-provider.tpl -t terragrunt
+          octo pack --id="${{ inputs.SERVICE_NAME }}.terragrunt" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/terragrunt" --outFolder="$GITHUB_WORKSPACE"
 
       - name: Push a package to Octopus Deploy 🐙
         uses: OctopusDeploy/push-package-action@v1.1.2
         with:
-          api_key: ${{ secrets.CD_API_KEY }}
-          packages: 'helm'
-          server: ${{ secrets.CD_SERVER }}
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+          packages: '${{ inputs.SERVICE_NAME }}.helm.${{ env.PACKAGE_VERSION }}.zip,${{ inputs.SERVICE_NAME }}.terragrunt.${{ env.PACKAGE_VERSION }}.zip'
+          server: https://delio.octopus.app
