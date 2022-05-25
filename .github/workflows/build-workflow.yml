@@ -15,6 +15,10 @@ on:
     secrets:
       GITHUB_MACHINE_TOKEN:
         required: true
+      CD_API_KEY:
+        required: true
+      CD_SERVER:
+        required: true
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
@@ -63,14 +67,14 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Get release info
-        id: get_release
-        uses: bruceadams/get-release@v1.2.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Octopus CLI 🐙
+        uses: OctopusDeploy/install-octopus-cli-action@v1
+        with:
+          version: '*'
 
-      - name: Package and push artefacts to S3
-        run: | 
-          tar zcf ${{ inputs.SERVICE_NAME }}-${{ steps.get_release.outputs.tag_name }}.tgz terraform helm terragrunt.hcl s3-backend.tpl s3-provider.tpl azurerm-backend.tpl azurerm-provider.tpl
-          ls -lisa
-          aws s3 sync ${{ inputs.SERVICE_NAME }}-${{ steps.get_release.outputs.tag_name }}.tgz s3://${{ inputs.S3_BUCKET_NAME }}/${{ inputs.SERVICE_NAME }}/helm/${{ steps.get_release.outputs.tag_name }}/
+      - name: Push a package to Octopus Deploy 🐙
+        uses: OctopusDeploy/push-package-action@v1.1.2
+        with:
+          api_key: ${{ secrets.CD_API_KEY }}
+          packages: 'helm'
+          server: ${{ secrets.CD_SERVER }}
