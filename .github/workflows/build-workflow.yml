@@ -70,10 +70,21 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Get release info
+        id: get_release
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
       - name: Install Octopus CLI 🐙
         uses: OctopusDeploy/install-octopus-cli-action@v1
         with:
           version: '*'
+
+      - name: Package Helm
+        run: |
+          octo pack --id="Helm" --format="Zip" --version="${{ steps.get_release.outputs.tag_name }}" --basePath="$GITHUB_WORKSPACE/helm" --outFolder="$GITHUB_WORKSPACE"
 
       - name: Push a package to Octopus Deploy 🐙
         uses: OctopusDeploy/push-package-action@v1.1.2
