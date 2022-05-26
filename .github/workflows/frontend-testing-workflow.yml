@@ -7,7 +7,7 @@ on:
         required: true
 
 jobs:
-  lint:
+  unit-testing:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
