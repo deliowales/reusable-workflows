@@ -1,0 +1,27 @@
+name: Frontend Pre Build Workflow
+
+on:
+  workflow_call:
+    secrets:
+      GITHUB_MACHINE_TOKEN:
+        required: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: |
+          rm -rf .npmrc
+          echo "@deliowales:registry=https://npm.pkg.github.com/" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_MACHINE_TOKEN }}" >> .npmrc
+
+      - run: yarn install --production=false
+      - run: yarn build --stats=verbose
+        env:
+          NODE_OPTIONS: --max_old_space_size=3072
