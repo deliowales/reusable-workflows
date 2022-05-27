@@ -1,4 +1,4 @@
-name: Frontend Linting Workflow
+name: Frontend Build Workflow
 
 on:
   workflow_call:
@@ -38,22 +38,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Set Version
-          run: echo "PACKAGE_VERSION=${{ steps.get_release.outputs.tag_name }}" >> $GITHUB_ENV
+      - name: Set Version
+        run: echo "PACKAGE_VERSION=${{ steps.get_release.outputs.tag_name }}" >> $GITHUB_ENV
 
-        - name: Install Octopus CLI 🐙
-          uses: OctopusDeploy/install-octopus-cli-action@v1
-          with:
-            version: '*'
+      - name: Install Octopus CLI 🐙
+        uses: OctopusDeploy/install-octopus-cli-action@v1
+        with:
+          version: '*'
 
-        - name: Package Frontend
-          run: |
-            octo pack --id="${{ inputs.SERVICE_NAME }}.ui" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/build" --outFolder="$GITHUB_WORKSPACE"
+      - name: Package Frontend
+        run: |
+          octo pack --id="${{ inputs.SERVICE_NAME }}.ui" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/build" --outFolder="$GITHUB_WORKSPACE"
 
-        - name: Push a package to Octopus Deploy 🐙
-          uses: OctopusDeploy/push-package-action@v1.1.2
-          with:
-            api_key: ${{ secrets.CD_API_KEY }}
-            packages: '${{ inputs.SERVICE_NAME }}.ui.${{ env.PACKAGE_VERSION }}.zip'
-            server: ${{ secrets.CD_SERVER }}
+      - name: Push a package to Octopus Deploy 🐙
+        uses: OctopusDeploy/push-package-action@v1.1.2
+        with:
+          api_key: ${{ secrets.CD_API_KEY }}
+          packages: '${{ inputs.SERVICE_NAME }}.ui.${{ env.PACKAGE_VERSION }}.zip'
+          server: ${{ secrets.CD_SERVER }}
 
