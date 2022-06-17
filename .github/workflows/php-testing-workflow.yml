@@ -63,7 +63,7 @@ jobs:
           cp -n .env.example .env
           ./artisan key:generate
 
-      - if: github.input.ENABLE_LARAVEL_PASSPORT == 'true'
+      - if: inputs.ENABLE_LARAVEL_PASSPORT == 'true'
         name: Setup Laravel Passport key
         run: |
           ./artisan passport:keys
