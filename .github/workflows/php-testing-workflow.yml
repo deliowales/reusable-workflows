@@ -6,7 +6,7 @@ on:
     inputs:
       ENABLE_LARAVEL_PASSPORT:
         required: false
-        type: boolean
+        type: string
         default: false
     secrets:
       DEPLOYMENT_SSH_PRIVATE_KEY:
@@ -63,7 +63,7 @@ jobs:
           cp -n .env.example .env
           ./artisan key:generate
 
-      - if: github.event.input.ENABLE_LARAVEL_PASSPORT  == true
+      - if: github.event.input.ENABLE_LARAVEL_PASSPORT == 'true'
         name: Setup Laravel Passport key
         run: |
           ./artisan passport:keys
