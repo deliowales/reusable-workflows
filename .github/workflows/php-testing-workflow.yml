@@ -1,0 +1,80 @@
+
+name: Unit Testing Workflow
+
+on:
+  workflow_call:
+    inputs:
+      ENABLE_LARAVEL_PASSPORT:
+        required: false
+        type: boolean
+    secrets:
+      DEPLOYMENT_SSH_PRIVATE_KEY:
+        required: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test_tenant
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    name: Test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.DEPLOYMENT_SSH_PRIVATE_KEY }}
+
+      - name: Cache PHP dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Validate Composer Config File
+        run: |
+          composer validate
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo
+          coverage: none
+
+      - name: Install PHP dependencies
+        run: |
+          composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+      - name: Setup Laravel encryption key
+        run: |
+          cp -n .env.example .env
+          ./artisan key:generate
+
+      - if: github.event.input.ENABLE_LARAVEL_PASSPORT  == true
+        name: Setup Laravel Passport key
+        run: |
+          ./artisan passport:keys
+
+      - name: Run All Checks
+        run: composer run all-checks
+        env:
+          DB_HOST: localhost
+          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          DB_PASSWORD: password
+          DB_DATABASE: test_tenant
+          DB_USERNAME: postgres
+          DB_LANDLORD_SEARCH_PATH: public
+          APP_TLD: localhost
+
