@@ -7,7 +7,7 @@ on:
       ENABLE_LARAVEL_PASSPORT:
         required: false
         type: string
-        default: 'false'
+        default: 'true'
     secrets:
       DEPLOYMENT_SSH_PRIVATE_KEY:
         required: true
