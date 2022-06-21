@@ -9,9 +9,6 @@ on:
       SERVICE_NAME:
         required: true
         type: string
-      S3_BUCKET_NAME:
-        required: true
-        type: string
       IAM_ROLE:
         required: true
         type: string
