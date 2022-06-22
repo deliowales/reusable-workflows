@@ -17,6 +17,8 @@ on:
         required: true
       CD_SERVER:
         required: true
+      DEPLOYMENT_SSH_PRIVATE_KEY:
+        required: true
 
 jobs:
   build-and-push-image:
