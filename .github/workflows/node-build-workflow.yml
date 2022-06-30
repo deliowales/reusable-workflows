@@ -46,35 +46,25 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: ${{ env.REGISTRY }}/deliowales/${{ inputs.SERVICE_NAME }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Get release info
         id: get_release
         uses: bruceadams/get-release@v1.2.3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_MACHINE_TOKEN }}
 
       - name: Set Version
         run: echo "PACKAGE_VERSION=${{ steps.get_release.outputs.tag_name }}" >> $GITHUB_ENV
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ inputs.SERVICE_NAME }}:$PACKAGE_VERSION .
+          docker push $ECR_REGISTRY/${{ inputs.SERVICE_NAME }}:$PACKAGE_VERSION
 
       - name: Install Octopus CLI 🐙
         uses: OctopusDeploy/install-octopus-cli-action@v1
