@@ -8,6 +8,11 @@ on:
         required: false
         type: string
         default: 'false'
+      PHP_VERSION:
+        required: false
+        type: string
+        default: 8.1
+
     secrets:
       DEPLOYMENT_SSH_PRIVATE_KEY:
         required: true
@@ -50,7 +55,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: ${{ inputs.PHP_VERSION }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo
           coverage: none
 
