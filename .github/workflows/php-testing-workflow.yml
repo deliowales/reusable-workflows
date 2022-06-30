@@ -12,7 +12,10 @@ on:
         required: false
         type: string
         default: 8.1
-
+      ENABLE_PHP_DECIMAL:
+        required: false
+        type: string
+        default: 'false'
     secrets:
       DEPLOYMENT_SSH_PRIVATE_KEY:
         required: true
@@ -47,6 +50,16 @@ jobs:
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-
+
+      - if: inputs.ENABLE_PHP_DECIMAL == 'true'
+        name: Install PHP Decimal Dependencies
+        run: | 
+         sudo apt update && \
+         sudo apt-get install libmpdec-dev libpng-dev && \
+         sudo pecl install decimal && \
+         sudo docker-php-ext-enable decimal && \
+         sudo docker-php-ext-install gd && \
+         sudo composer self-update
 
       - name: Validate Composer Config File
         run: |
