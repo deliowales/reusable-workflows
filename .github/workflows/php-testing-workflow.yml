@@ -57,8 +57,8 @@ jobs:
          sudo apt update && \
          sudo apt-get install libmpdec-dev libpng-dev && \
          sudo pecl install decimal && \
-         sudo docker-php-ext-enable decimal && \
-         sudo docker-php-ext-install gd && \
+#         sudo docker-php-ext-enable decimal && \
+#         sudo docker-php-ext-install gd && \
          sudo composer self-update
 
       - name: Validate Composer Config File
